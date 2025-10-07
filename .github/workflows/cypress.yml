@@ -91,7 +91,7 @@ jobs:
     - name: Run E2E tests
       run: |
         export DISPLAY=:99
-        npm run e2e:ci
+        npm run e2e
       env:
         VITE_HOST: ${{ env.VITE_HOST }}
         VITE_PORT: ${{ env.VITE_PORT }}

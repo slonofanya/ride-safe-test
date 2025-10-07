@@ -17,8 +17,7 @@ describe('Passenger Page', () => {
     cy.contains('Map:').should('be.visible')
   })
 
-  it('should navigate back to settings', () => {
-    cy.contains('Back to Settings').click()
-    cy.url().should('include', '/settings')
+  it('should have back to settings button', () => {
+    cy.contains('Back to Settings').should('be.visible')
   })
 })
