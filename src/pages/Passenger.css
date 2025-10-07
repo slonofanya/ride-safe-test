@@ -1,0 +1,92 @@
+.passenger-container {
+  padding: 16px;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.passenger-header {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: white;
+  text-align: center;
+}
+
+.header-content h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.map-status {
+  font-size: 14px;
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.rides-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #1890ff;
+}
+
+.error-container {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-text {
+  font-size: 16px;
+  color: #ff4d4f;
+  margin-bottom: 16px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+  .passenger-container {
+    padding: 12px;
+  }
+
+  .header-content {
+    padding: 16px 12px;
+  }
+
+  .header-content h2 {
+    font-size: 20px;
+  }
+
+  .map-status {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+}

@@ -1,0 +1,119 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run unit tests
+      run: npm run test
+      
+    - name: Run linting
+      run: npm run lint
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Chrome dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3-dev libxss1 libasound2-dev libxtst6 xvfb
+      
+    - name: Set environment variables
+      run: |
+        echo "VITE_HOST=${VITE_HOST:-127.0.0.1}" >> $GITHUB_ENV
+        echo "VITE_PORT=${VITE_PORT:-5173}" >> $GITHUB_ENV
+        echo "PREVIEW_PORT=${PREVIEW_PORT:-4173}" >> $GITHUB_ENV
+        echo "VITE_APP_TITLE=${VITE_APP_TITLE:-Ride Safe - CarSharing App}" >> $GITHUB_ENV
+        echo "VITE_APP_DESCRIPTION=${VITE_APP_DESCRIPTION:-CarSharing app with feature flags for passenger and driver views}" >> $GITHUB_ENV
+        echo "APP_URL=http://${VITE_HOST:-127.0.0.1}:${PREVIEW_PORT:-4173}" >> $GITHUB_ENV
+        echo "Set APP_URL to: http://${VITE_HOST:-127.0.0.1}:${PREVIEW_PORT:-4173}"
+      
+    - name: Build application
+      run: npm run build
+      env:
+        VITE_HOST: ${{ env.VITE_HOST }}
+        VITE_PORT: ${{ env.VITE_PORT }}
+        VITE_APP_TITLE: ${{ env.VITE_APP_TITLE }}
+        VITE_APP_DESCRIPTION: ${{ env.VITE_APP_DESCRIPTION }}
+      
+    - name: Start application
+      run: npm run preview &
+      env:
+        VITE_HOST: ${{ env.VITE_HOST }}
+        VITE_PORT: ${{ env.VITE_PORT }}
+        VITE_APP_TITLE: ${{ env.VITE_APP_TITLE }}
+        VITE_APP_DESCRIPTION: ${{ env.VITE_APP_DESCRIPTION }}
+      
+    - name: Wait for application
+      run: |
+        echo "Waiting for application at: ${{ env.APP_URL }}"
+        npx wait-on ${{ env.APP_URL }}
+        
+    - name: Start Xvfb
+      run: |
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      
+    - name: Run E2E tests
+      run: |
+        export DISPLAY=:99
+        npm run e2e:ci
+      env:
+        VITE_HOST: ${{ env.VITE_HOST }}
+        VITE_PORT: ${{ env.VITE_PORT }}
+        PREVIEW_PORT: ${{ env.PREVIEW_PORT }}
+        VITE_APP_TITLE: ${{ env.VITE_APP_TITLE }}
+        VITE_APP_DESCRIPTION: ${{ env.VITE_APP_DESCRIPTION }}
+        CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+      
+    - name: Upload E2E test videos
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-videos
+        path: cypress/videos/
+        retention-days: 30
+        
+    - name: Upload E2E test screenshots
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-screenshots
+        path: cypress/screenshots/
+        retention-days: 30
+
+
